@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using EnemyAPI;
 
-namespace DynamicRandomness
+namespace DynamicRandomness.Behaviours.Overrides
 {
     class GatlingGullDynamicBehaviour : DynamicAttackBehaviourGroup, IAttackBehaviorGroup
     {

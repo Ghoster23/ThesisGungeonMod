@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using EnemyAPI;
 
-namespace DynamicRandomness
+namespace DynamicRandomness.Behaviours.Overrides
 {
     class BulletKingBehaviourAlpha : OverrideBehavior
     {

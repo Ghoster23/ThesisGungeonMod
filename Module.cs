@@ -1,25 +1,34 @@
-﻿using ItemAPI;
-using EnemyAPI;
+﻿using EnemyAPI;
 using GungeonAPI;
 using UnityEngine;
-using System.Net;
 
 namespace DynamicRandomness
 {
     public class Module : ETGModule
     {
         public static readonly string MOD_NAME = "Dynamic Randomness Mod";
-        public static readonly string VERSION = "0.1.0";
+        public static readonly string VERSION = "0.6.0";
         public static readonly string TEXT_COLOR = "#7851A9";
 
         public static int BossClone = 0;
-        public static readonly int Order = Random.Range(0,2);
+        public static readonly int Order = Random.Range(0,3);
+
+        public static bool TutorialDone = false;
 
         public override void Start()
         {
+            if (!BraveRandom.IsInitialized()) BraveRandom.InitializeRandom();
+
+            // Init DRM Hooks
             Hooks.Init();
+
+            // Init EnemyAPI
+            EnemyAPI.Hooks.Init();
             EnemyAPI.Tools.Init();
 
+            // Set Up Commands
+            #region Commands
+            /*
             ETGModConsole.Commands.AddGroup("thesis", args =>
             {
                 ThesisFloorGenerator.Enabled = !ThesisFloorGenerator.Enabled;
@@ -28,29 +37,21 @@ namespace DynamicRandomness
                     (ThesisFloorGenerator.Enabled ? "enabled" : "disabled"));
             });
 
-            ETGModConsole.Commands.GetGroup("thesis").AddUnit("upload", args =>
+            ETGModConsole.Commands.GetGroup("thesis").AddUnit("npcs", args =>
             {
-                // Create a new WebClient instance.
-                WebClient myWebClient = new WebClient();
+                var stats = GameStatsManager.Instance;
 
-                // Upload the file to the URI.
-                // The 'UploadFile(uriString,fileName)' method implicitly uses HTTP POST method.
-                byte[] responseArray = myWebClient.UploadFile(
-                    "http://web.tecnico.ulisboa.pt/ist186470/thesis/testupload.html",
-                    "./BehaviourLogs/GatlingGull_0.txt");
-
-                var responseString = System.Text.Encoding.ASCII.GetString(responseArray);
-
-                ETGModDebugLogMenu.Log(responseString);
-                System.IO.File.WriteAllText("upload_log.txt", responseString);
+                stats.SetFlag(GungeonFlags.DAISUKE_ACTIVE_IN_FOYER, true);
             });
+            */
+            #endregion
 
-            DungeonHooks.OnPreDungeonGeneration += ThesisFloorGenerator.OnPreDungeonGen;
+            this.OverrideQuickStart();
 
             var drController = ETGModMainBehaviour.Instance
                 .gameObject.AddComponent<DynamicRandomnessController>();
 
-            drController.Init();
+            drController.Init();            
 
             Log($"{MOD_NAME} v{VERSION} started successfully.", TEXT_COLOR);
         }
@@ -66,5 +67,17 @@ namespace DynamicRandomness
         public override void Exit() { }
 
         public override void Init() { }
+
+
+        private void OverrideQuickStart()
+        {
+            GameManager.Instance.InjectedLevelName = "tt_tutorial";
+            ETGMod.Player.QuickstartReplacement = "PlayerRogue";
+            ETGMod.Player.PlayerReplacement = "PlayerRogue";
+
+            DungeonHooks.OnPreDungeonGeneration += ThesisFloorGenerator.OnPreDungeonGen;
+
+            Foyer.DoMainMenu = false;
+        }
     }
 }

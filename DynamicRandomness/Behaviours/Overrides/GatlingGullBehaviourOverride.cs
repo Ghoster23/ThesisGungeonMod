@@ -1,6 +1,7 @@
 ﻿using EnemyAPI;
+using DynamicRandomness.Behaviours.Attacks;
 
-namespace DynamicRandomness
+namespace DynamicRandomness.Behaviours.Overrides
 {
     class GatlingGullBehaviourOverride : OverrideBehavior
     {
@@ -23,6 +24,7 @@ namespace DynamicRandomness
             {
                 default:
                 case 1: // Patterned
+                    this.SequentialOverride();
                     break;
 
                 case 2: // Dynamic
@@ -42,6 +44,35 @@ namespace DynamicRandomness
             Module.BossClone++;
         }
 
+
+        private void SequentialOverride()
+        {
+            var origAttackGroup = behaviorSpec.AttackBehaviorGroup;
+
+            var newBehaviour = new GatlingGullSequentialBehaviour
+            {
+                AttackBehaviors = origAttackGroup.AttackBehaviors
+            };
+
+            newBehaviour.AttackBehaviors[0] = new AttackBehaviorGroup.AttackGroupItem()
+            {
+                Behavior = new GatlingGullWalkAndFanSpray(),
+                NickName = "Walk And Fan Spray",
+                Probability = 3f
+            };
+
+            for (var i = 0; i < behaviorSpec.AttackBehaviors.Count; i++)
+            {
+                var attackBehaviour = behaviorSpec.AttackBehaviors[i];
+
+                if (attackBehaviour is AttackBehaviorGroup)
+                {
+                    behaviorSpec.AttackBehaviors[i] = newBehaviour;
+                }
+            }
+
+            newBehaviour.Init(behaviorSpec.gameObject, behaviorSpec.aiActor, behaviorSpec.aiShooter);
+        }
 
         private void DynamicOverride()
         {

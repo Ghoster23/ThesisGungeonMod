@@ -122,3 +122,11 @@ D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\Mod Project\ob
 D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\Mod Project\obj\Debug\DynamicRandomnessMod.pdb
 D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\Mod Project\bin\Debug\GungeonAPI.dll
 D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\Mod Project\obj\Debug\Mod.csprojAssemblyReference.cache
+D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\ThesisGungeonMod\bin\Debug\DynamicRandomnessMod.dll
+D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\ThesisGungeonMod\bin\Debug\DynamicRandomnessMod.pdb
+D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\ThesisGungeonMod\bin\Debug\GungeonAPI.dll
+D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\ThesisGungeonMod\obj\Debug\Mod.csprojAssemblyReference.cache
+D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\ThesisGungeonMod\obj\Debug\Mod.csproj.CoreCompileInputs.cache
+D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\ThesisGungeonMod\obj\Debug\Mod.csproj.CopyComplete
+D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\ThesisGungeonMod\obj\Debug\DynamicRandomnessMod.dll
+D:\M\Documentos\Uni\Thesis\Gungeon Modding\Dynamic Randomness Mod\ThesisGungeonMod\obj\Debug\DynamicRandomnessMod.pdb

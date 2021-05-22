@@ -87,18 +87,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DynamicRandomness\BulletKingBehaviourAlpha.cs" />
-    <Compile Include="DynamicRandomness\PlaythroughData.cs" />
-    <Compile Include="DynamicRandomness\GatlingGullDynamicBehaviour.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\Attacks\GatlingGullWalkAndFanSpray.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\Overrides\BulletKingBehaviourAlpha.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\Overrides\GatlingGullSequentialBehaviour.cs" />
+    <Compile Include="DynamicRandomness\Data Logging\BattleData.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\SequentialAttackBehaviourGroup.cs" />
+    <Compile Include="DynamicRandomness\Hooks.cs" />
+    <Compile Include="DynamicRandomness\Data Logging\PlaythroughData.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\Overrides\GatlingGullDynamicBehaviour.cs" />
     <Compile Include="DynamicRandomness\ThesisFloorGenerator.cs" />
-    <Compile Include="DynamicRandomness\DynamicAttackBehaviourGroup.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\DynamicAttackBehaviourGroup.cs" />
     <Compile Include="DynamicRandomness\DynamicRandomnessController.cs" />
-    <Compile Include="DynamicRandomness\GatlingGullBehaviourOverride.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\Overrides\GatlingGullBehaviourOverride.cs" />
     <Compile Include="EnemyAPI\Hooks.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="EnemyAPI\OverrideBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EnemyAPI\Tools.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
