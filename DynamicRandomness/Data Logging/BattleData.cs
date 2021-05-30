@@ -3,35 +3,34 @@
 namespace DynamicRandomness.Data_Logging
 {
     [Serializable]
-    class BattleData
+    public class BattleData
     {
-        private double _duration;
+        public double duration;
 
-        private bool _victory;
+        public bool victory;
 
-        private int _damageReceived;
+        public float playerHealth;
 
-        private float _damageDone;
+        public float bossHealth;
 
-        private int _variant;
-
-
-        private DateTime _battleStart;
+        public int variant;
 
 
-        public BattleData(DateTime battleStart, int variant)
+        public BattleData(int variant)
         {
-            _battleStart = battleStart;
-
-            _variant = variant;
+            this.variant = variant;
         }
 
 
-        public void BattleEnd(DateTime battleEnd, bool victory)
+        public void BattleEnd(double duration, float playerHealth, float bossHealth)
         {
-            _duration = battleEnd.Subtract(_battleStart).TotalSeconds;
+            this.duration = duration;
 
-            _victory = victory;
+            this.playerHealth = playerHealth;
+
+            this.bossHealth = bossHealth;
+
+            this.victory = this.playerHealth >= 0 && this.bossHealth <= 0;
         }
     }
 }

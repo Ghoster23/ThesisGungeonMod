@@ -37,10 +37,6 @@ namespace DynamicRandomness.Behaviours.Overrides
                     break;
             }
 
-            Module.Log("Overriding Gatling Gull behaviour with pattern " + pattern);
-
-            Tools.DebugInformation(this.behaviorSpec, "./BehaviourLogs/GatlingGull_" + Module.BossClone + ".txt");
-
             Module.BossClone++;
         }
 
@@ -54,12 +50,14 @@ namespace DynamicRandomness.Behaviours.Overrides
                 AttackBehaviors = origAttackGroup.AttackBehaviors
             };
 
+            /*
             newBehaviour.AttackBehaviors[0] = new AttackBehaviorGroup.AttackGroupItem()
             {
                 Behavior = new GatlingGullWalkAndFanSpray(),
                 NickName = "Walk And Fan Spray",
                 Probability = 3f
             };
+            */
 
             for (var i = 0; i < behaviorSpec.AttackBehaviors.Count; i++)
             {

@@ -1,11 +1,19 @@
-﻿using UnityEngine;
-using EnemyAPI;
+﻿using System.Collections.Generic;
 
 namespace DynamicRandomness.Behaviours.Overrides
 {
     class GatlingGullDynamicBehaviour : DynamicAttackBehaviourGroup, IAttackBehaviorGroup
     {
+        public override void Start()
+        {
+            base.Start();
 
+            this.AttackSequence = new List<int>()
+            {
+                0, 2, 2, 3, 4, 1, 2, 2, 3, 5, 2, 2, 3
+            };
+        }
+        
         protected override void ActivateBalancedState()
         {
             this.AttackBehaviors[0].Probability = 2;
@@ -18,12 +26,7 @@ namespace DynamicRandomness.Behaviours.Overrides
 
         protected override void ActivateWinningState()
         {
-            this.AttackBehaviors[0].Probability = 3;
-            this.AttackBehaviors[1].Probability = 2;
-            this.AttackBehaviors[2].Probability = 1.5f;
-            this.AttackBehaviors[3].Probability = 1.5f;
-            this.AttackBehaviors[4].Probability = 1;
-            this.AttackBehaviors[5].Probability = 3;
+            return;
         }
 
         protected override void ActivateLosingState()

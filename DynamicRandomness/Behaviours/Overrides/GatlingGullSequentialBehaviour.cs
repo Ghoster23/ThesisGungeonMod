@@ -1,15 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace DynamicRandomness.Behaviours.Overrides
 {
     class GatlingGullSequentialBehaviour : SequentialAttackBehaviourGroup, IAttackBehaviorGroup
     {
-        protected new List<int> SequenceOverride = new List<int>()
+        public override void Start()
         {
-            0, 1, 0, 4, 2, 1, 4, 3, 4, 3, 1, 4, 5
-        };
+            base.Start();
+
+            /* Attack Behaviours:
+             * 0 - Walk and Spray
+             * 1 - Fan Spray
+             * 2 - Big Shot
+             * 3 - Waves
+             * 4 - Leap
+             * 5 - Rockets (has Leap embedded)
+             */
+
+            this.SequenceOverride = new List<int>()
+            {
+                0, 2, 2, 3, 4, 1, 2, 2, 3, 5, 2, 2, 3
+            };
+        }
     }
 }

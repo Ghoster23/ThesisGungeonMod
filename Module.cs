@@ -1,17 +1,24 @@
 ﻿using EnemyAPI;
 using GungeonAPI;
 using UnityEngine;
+using DynamicRandomness.Data_Logging;
 
 namespace DynamicRandomness
 {
     public class Module : ETGModule
     {
-        public static readonly string MOD_NAME = "Dynamic Randomness Mod";
-        public static readonly string VERSION = "0.6.0";
+        public static bool Debug = false;
+
+        public static readonly string MOD_NAME = "DR Mod";
+        public static readonly string VERSION = "0.9.1";
         public static readonly string TEXT_COLOR = "#7851A9";
 
         public static int BossClone = 0;
         public static readonly int Order = Random.Range(0,3);
+
+        public static DynamicRandomnessController Controller;
+
+        public static PlaythroughData Data;
 
         public static bool TutorialDone = false;
 
@@ -28,33 +35,33 @@ namespace DynamicRandomness
 
             // Set Up Commands
             #region Commands
-            /*
             ETGModConsole.Commands.AddGroup("thesis", args =>
             {
-                ThesisFloorGenerator.Enabled = !ThesisFloorGenerator.Enabled;
-
-                Log("Thesis floor generation is " +
-                    (ThesisFloorGenerator.Enabled ? "enabled" : "disabled"));
+                Log("DR Mod is running and the experiment scenario will be created.\n"+
+                    "\tThe following sub-commands are available:\n"+
+                    "\t\tdebug - toggles debug messages for the experiment;\n");
             });
 
-            ETGModConsole.Commands.GetGroup("thesis").AddUnit("npcs", args =>
+            ETGModConsole.Commands.GetGroup("thesis").AddUnit("debug", args =>
             {
-                var stats = GameStatsManager.Instance;
+                Debug = !Debug;
 
-                stats.SetFlag(GungeonFlags.DAISUKE_ACTIVE_IN_FOYER, true);
+                Log("DR Mod - Debug messages " + (Debug ? "activated" : "deactivated"));
             });
-            */
             #endregion
 
             this.OverrideQuickStart();
 
-            var drController = ETGModMainBehaviour.Instance
+            Controller = ETGModMainBehaviour.Instance
                 .gameObject.AddComponent<DynamicRandomnessController>();
 
-            drController.Init();            
+            Data = new PlaythroughData(Order, Time.time);
 
             Log($"{MOD_NAME} v{VERSION} started successfully.", TEXT_COLOR);
+
+            Log($"Experiment Variant -> {Order}");
         }
+
 
         public static void Log(string text, string color="#FFFFFF")
         {
@@ -63,6 +70,7 @@ namespace DynamicRandomness
             else
                 ETGModConsole.Log($"<color={TEXT_COLOR}>{text}</color>");
         }
+
 
         public override void Exit() { }
 

@@ -13,8 +13,10 @@ namespace DynamicRandomness
 			if (notFoyer && flow.name != "Tutorial Flow")
 			{
 				Module.BossClone = 0;
+				dungeonSeed = Module.Order;
+				dungeon.DungeonSeed = Module.Order;
+				GameManager.Instance.CurrentRunSeed = Module.Order;
 
-			    //flow = ThesisFloorGenerator.CreateSequentialThesisFlow(dungeon);
 				flow = ThesisFloorGenerator.CreateBranchingThesisFlow(dungeon);
 				generator.AssignFlow(flow);
 			}
@@ -59,15 +61,13 @@ namespace DynamicRandomness
 			dungeonFlow.FirstNode = parent;
 			dungeonFlow.AddNodeToFlow(parent, null);
 
-			ThesisFloorGenerator.AppendRoom(dungeonFlow, parent, "b1_bossroom_gullA_test.room");
+			AppendBossRoom(dungeonFlow, parent);
 
-			ThesisFloorGenerator.AppendRoom(dungeonFlow, parent, "a1_legendarychests.room");
+			if(Module.Debug) ThesisFloorGenerator.AppendRoom(dungeonFlow, parent, "a1_legendarychests.room");
 
-			ThesisFloorGenerator.AppendRoom(dungeonFlow, parent, "b1_bossroom_gullA_test.room");
+			AppendBossRoom(dungeonFlow, parent);
 
-			ThesisFloorGenerator.AppendRoom(dungeonFlow, parent, "b1_bossroom_gullA_test.room");
-
-			//parent = ThesisFloorGenerator.AppendExitElevator(dungeonFlow, parent);
+			AppendBossRoom(dungeonFlow, parent);
 
 			dungeon = null;
 			return dungeonFlow;
@@ -106,6 +106,16 @@ namespace DynamicRandomness
 			dungeonFlow.AddNodeToFlow(dungeonFlowNode, parentNode);
 
 			return dungeonFlowNode;
+		}
+
+
+		private static void AppendBossRoom(DungeonFlow dungeonFlow, DungeonFlowNode parentNode)
+        {
+			DungeonFlowNode dungeonFlowNode = SampleFlow.NodeFromAssetName(dungeonFlow, "GatlingGullRoom02");
+
+			dungeonFlowNode.overrideExactRoom.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.MINI_BOSS;
+
+			dungeonFlow.AddNodeToFlow(dungeonFlowNode, parentNode);
 		}
 
 

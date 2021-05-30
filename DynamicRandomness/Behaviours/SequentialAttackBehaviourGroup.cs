@@ -6,19 +6,16 @@ namespace DynamicRandomness.Behaviours
 {
     class SequentialAttackBehaviourGroup : AttackBehaviorGroup, IAttackBehaviorGroup
     {
-		private enum State
-		{
-			Idle,
-			Update,
-			ContinuousUpdate,
-			Cooldown
-		}
-
-		private State m_state;
-
 		private int m_currentIndex = -1;
 
-		private float m_overrideCooldownTimer;
+		private int m_sequenceLength
+        {
+			get
+            {
+				if (this.IsOverriden) return this.SequenceOverride.Count;
+				else return this.AttackBehaviors.Count;
+            }
+        }
 
 		protected List<int> SequenceOverride;
 
@@ -34,49 +31,41 @@ namespace DynamicRandomness.Behaviours
 		{
 			get
 			{
-				if(this.SequenceOverride != null)
+				if(this.IsOverriden)
                 {
-					var ind = this.m_currentIndex % this.SequenceOverride.Count;
-					return this.AttackBehaviors[ind].Behavior;
+					var ind = m_currentIndex % this.SequenceOverride.Count;
+					return this.AttackBehaviors[this.SequenceOverride[ind]].Behavior;
                 }
 				else
-					return this.AttackBehaviors[this.m_currentIndex].Behavior;
+					return this.AttackBehaviors[m_currentIndex].Behavior;
 			}
 		}
-
 
 
 		public override BehaviorResult Update()
 		{
-			BehaviorResult behaviorResult = BehaviorResult.Continue;
+			if(m_currentIndex >= m_sequenceLength) m_currentIndex = 0;
 
-			if (behaviorResult != BehaviorResult.Continue)
-			{
-				return behaviorResult;
+			m_currentIndex = (m_currentIndex + 1) % m_sequenceLength;
+
+			while(!m_currentBehavior.IsReady())
+            {
+				m_currentIndex = (m_currentIndex + 1) % m_sequenceLength;
 			}
 
-			if (!this.IsReady())
-			{
-				return BehaviorResult.Continue;
-			}
-
-			this.m_currentIndex = 0;
-			this.m_state = State.Update;
-
-			bool flag = this.StepBehaviors();
-
-			if (flag)
-			{
-				return BehaviorResult.RunContinuous;
-			}
-
-			return BehaviorResult.SkipAllRemainingBehaviors;
+			return m_currentBehavior.Update();
 		}
+
 
 		public override ContinuousBehaviorResult ContinuousUpdate()
 		{
-			bool flag = this.StepBehaviors();
-			return (!flag) ? ContinuousBehaviorResult.Finished : ContinuousBehaviorResult.Continue;
+			if (this.m_currentBehavior == null)
+			{
+				ETGModConsole.Log("ERROR -> Sequential Attack Behaviour had a null current behaviour", true);
+
+				return ContinuousBehaviorResult.Finished;
+			}
+			return this.m_currentBehavior.ContinuousUpdate();
 		}
 
 		public override void EndContinuousUpdate()
@@ -84,76 +73,7 @@ namespace DynamicRandomness.Behaviours
 			if ((this.IsOverriden && this.m_currentIndex < this.SequenceOverride.Count) ||
 				(!this.IsOverriden && this.m_currentIndex < this.AttackBehaviors.Count))
 			{
-				this.m_currentBehavior.EndContinuousUpdate();
-			}
-			this.m_currentIndex = -1;
-		}
-
-		private bool StepBehaviors()
-		{
-			switch(this.m_state)
-            {
-				default:
-					Debug.LogError("Unrecognized State " + this.m_state);
-					return false;
-
-				case State.Cooldown:
-					this.m_overrideCooldownTimer += this.m_deltaTime;
-
-					if ((!this.IsOverriden && this.m_currentIndex == this.AttackBehaviors.Count - 1) ||
-						(this.IsOverriden && this.m_currentIndex == this.SequenceOverride.Count - 1))
-					{
-						return false;
-					}
-
-					if (this.m_currentBehavior.IsReady())
-					{
-						this.m_currentIndex++;
-						this.m_state = State.Update;
-						return this.StepBehaviors();
-					}
-					return true;
-
-				case State.Update:
-					BehaviorResult behaviorResult = this.m_currentBehavior.Update();
-
-					if (behaviorResult == BehaviorResult.Continue ||
-						behaviorResult == BehaviorResult.SkipRemainingClassBehaviors ||
-						behaviorResult == BehaviorResult.SkipAllRemainingBehaviors)
-					{
-						this.m_state = State.Cooldown;
-						this.m_overrideCooldownTimer = 0f;
-						return this.StepBehaviors();
-					}
-
-					if (behaviorResult == BehaviorResult.RunContinuous ||
-						behaviorResult == BehaviorResult.RunContinuousInClass)
-					{
-						this.m_state = State.ContinuousUpdate;
-						return true;
-					}
-
-					Debug.LogError("Unrecognized BehaviorResult " + behaviorResult);
-					return false;
-
-				case State.ContinuousUpdate:
-					ContinuousBehaviorResult continuousBehaviorResult = this.m_currentBehavior.ContinuousUpdate();
-
-					if (continuousBehaviorResult == ContinuousBehaviorResult.Finished)
-					{
-						this.m_currentBehavior.EndContinuousUpdate();
-						this.m_state = State.Cooldown;
-						this.m_overrideCooldownTimer = 0f;
-						return this.StepBehaviors();
-					}
-
-					if (continuousBehaviorResult == ContinuousBehaviorResult.Continue)
-					{
-						return true;
-					}
-
-					Debug.LogError("Unrecognized BehaviorResult " + continuousBehaviorResult);
-					return false;
+				if(this.m_currentBehavior != null) this.m_currentBehavior.EndContinuousUpdate();
 			}
 		}
 

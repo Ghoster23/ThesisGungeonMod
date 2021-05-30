@@ -1,16 +1,16 @@
 ﻿using System.Reflection;
-using System.Collections;
 using MonoMod.RuntimeDetour;
 using UnityEngine;
+using System.IO;
 
 namespace DynamicRandomness
 {
     class Hooks
     {
-        private static int s_savedSeed = 0;
 
         public static void Init()
         {
+            // Remove other Playable Characters from the Breach
             Hook characterSelectHook = new Hook(
                 typeof(FoyerCharacterSelectFlag).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
                 typeof(Hooks).GetMethod("FoyerCharacterDestroyHook")
@@ -18,6 +18,7 @@ namespace DynamicRandomness
 
             Debug.Log("Hooked -> FoyerCharacterDestroyHook");
 
+            // Override Breach doors to lead to the Tutorial
             Hook forceTutorialHook = new Hook(
                 typeof(FoyerGungeonDoor).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance),
                 typeof(Hooks).GetMethod("ForceTutorialHook")
@@ -25,6 +26,7 @@ namespace DynamicRandomness
 
             Debug.Log("Hooked -> ForceTutorialHook");
 
+            // Override the Tutorial's stairs to lead into the Test Level (Tutorial Skip)
             Hook forceGungeonHook = new Hook(
                 typeof(FoyerGungeonDoor).GetMethod("OnTriggered", BindingFlags.NonPublic | BindingFlags.Instance),
                 typeof(Hooks).GetMethod("TutorialEndRedirect")
@@ -32,6 +34,7 @@ namespace DynamicRandomness
 
             Debug.Log("Hooked -> TutorialEndRedirect");
 
+            // Override the Tutorial's elevator to lead into the Test Level (Tutorial complete)
             Hook tutorialElevatorHook = new Hook(
                 typeof(ElevatorDepartureController).GetMethod("TransitionToDepart", BindingFlags.NonPublic | BindingFlags.Instance),
                 typeof(Hooks).GetMethod("TransitionToDepartHook")
@@ -39,20 +42,7 @@ namespace DynamicRandomness
 
             Debug.Log("Hooked -> TransitionToDepartHook");
 
-            Hook teleporterHook = new Hook(
-                typeof(TeleporterController).GetMethod("Activate", BindingFlags.NonPublic | BindingFlags.Instance),
-                typeof(Hooks).GetMethod("ResetPlayerStats")
-            );
-
-            Debug.Log("Hooked -> ResetPlayerStats");
-
-            Hook dungeonSeedHook = new Hook(
-                typeof(Dungeonator.Dungeon).GetMethod("GetDungeonSeed", BindingFlags.Public | BindingFlags.Instance),
-                typeof(Hooks).GetMethod("KeepSeed")
-            );
-
-            Debug.Log("Hooked -> KeepSeed");
-
+            // Automatically re-start on Player death
             Hook deathRestartHook = new Hook(
                 typeof(GameManager).GetMethod("DoGameOver", BindingFlags.Public | BindingFlags.Instance),
                 typeof(Hooks).GetMethod("RestartOnDeath")
@@ -60,12 +50,29 @@ namespace DynamicRandomness
 
             Debug.Log("Hooked -> RestartOnDeath");
 
+            // Set Player Loadout to the desired state at the start of the Level
             Hook playerStatsHook = new Hook(
                 typeof(GameStatsManager).GetMethod("SetStat", BindingFlags.Public | BindingFlags.Instance),
                 typeof(Hooks).GetMethod("SetPlayerStats")
             );
 
             Debug.Log("Hooked -> SetPlayerStats");
+
+            // Signal the start of a Boss Battle
+            Hook battleStarted = new Hook(
+                typeof(GatlingGullIntroDoer).GetMethod("TriggerSequence", BindingFlags.Public | BindingFlags.Instance),
+                typeof(Hooks).GetMethod("BattleStarted")
+            );
+
+            Debug.Log("Hooked -> BattleStarted");
+
+            // Save the Playthrough Log
+            Hook saveLog = new Hook(
+                typeof(GameManager).GetMethod("OnApplicationQuit", BindingFlags.Public | BindingFlags.Instance),
+                typeof(Hooks).GetMethod("SaveLog")
+            );
+
+            Debug.Log("Hooked -> SaveLog");
         }
 
 
@@ -117,54 +124,15 @@ namespace DynamicRandomness
         {
             if (self.ReturnToFoyerWithNewInstance)
             {
-                Module.TutorialDone = true;
-
                 GameManager.Instance.QuickRestart();
+
+                Module.Controller.TutorialComplete();
+
+                Module.TutorialDone = true;
             }
             else
             {
                 orig(self, animator, clip);
-            }
-        }
-
-
-        public static void ResetPlayerStats(System.Action<TeleporterController> orig, TeleporterController self)
-        {
-            orig(self);
-
-            var player = GameManager.Instance.PrimaryPlayer;
-
-            player.healthHaver.FullHeal();
-            player.healthHaver.Armor = 0;
-
-            foreach (var gun in player.inventory.AllGuns)
-                gun.GainAmmo(gun.AdjustedMaxAmmo);
-
-            player.Blanks = 2;
-        }
-
-
-        public static int KeepSeed(System.Action<Dungeonator.Dungeon> orig, Dungeonator.Dungeon self)
-        {
-            if (Hooks.s_savedSeed == 0)
-            {
-                orig(self);
-
-                Hooks.s_savedSeed = GameManager.Instance.CurrentRunSeed;
-
-                Module.Log("Run Seed Saved: " + Hooks.s_savedSeed);
-
-                return Hooks.s_savedSeed;
-            }
-            else
-            {
-                self.DungeonSeed = Hooks.s_savedSeed;
-
-                orig(self);
-
-                Module.Log("Run Seed Used: " + GameManager.Instance.CurrentRunSeed);
-
-                return Hooks.s_savedSeed;
             }
         }
 
@@ -179,8 +147,27 @@ namespace DynamicRandomness
         {
             orig(self, trackedStats, value);
 
-            if(trackedStats == TrackedStats.TIME_PLAYED && value == 0f)
+            if (trackedStats == TrackedStats.TIME_PLAYED && value == 0f)
+            {
                 GameManager.Instance.PrimaryPlayer.GiveItem("heart_holster");
+            }
+        }
+
+
+        public static void BattleStarted(System.Action<GatlingGullIntroDoer, PlayerController> orig,
+            GatlingGullIntroDoer self, PlayerController player)
+        {
+            orig(self, player);
+
+            Module.Controller.BattleStarted(self.healthHaver);
+        }
+
+
+        public static void SaveLog(System.Action<GameManager> orig, GameManager self)
+        {
+            orig(self);
+
+            File.WriteAllText("log.json", Module.Data.GetJSON());
         }
         #endregion
     }
