@@ -56,7 +56,12 @@ namespace DynamicRandomness
 
 			dungeonFlow.name = "thesis_flow_branching";
 
-			var parent = MakeNode(LoadRoom("lobby.room"), dungeonFlow);
+			DungeonFlowNode parent = null;
+				
+			if(Module.Debug)
+				parent = MakeNode(LoadRoom("lobby.room"), dungeonFlow);
+			else
+				parent = MakeNode(LoadRoom("lobby_.room"), dungeonFlow);
 
 			dungeonFlow.FirstNode = parent;
 			dungeonFlow.AddNodeToFlow(parent, null);

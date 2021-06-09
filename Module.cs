@@ -10,7 +10,7 @@ namespace DynamicRandomness
         public static bool Debug = false;
 
         public static readonly string MOD_NAME = "DR Mod";
-        public static readonly string VERSION = "0.9.1";
+        public static readonly string VERSION = "0.9.8";
         public static readonly string TEXT_COLOR = "#7851A9";
 
         public static int BossClone = 0;

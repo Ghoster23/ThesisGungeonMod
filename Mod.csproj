@@ -89,12 +89,14 @@
   <ItemGroup>
     <Compile Include="DynamicRandomness\Behaviours\Attacks\GatlingGullWalkAndFanSpray.cs" />
     <Compile Include="DynamicRandomness\Behaviours\Overrides\BulletKingBehaviourAlpha.cs" />
-    <Compile Include="DynamicRandomness\Behaviours\Overrides\GatlingGullSequentialBehaviour.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\Overrides\SubBehaviours\GatlingGullChaoticBehaviour.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\Overrides\SubBehaviours\GatlingGullSequentialBehaviour.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\ChaoticAttackBehaviourGroup.cs" />
     <Compile Include="DynamicRandomness\Data Logging\BattleData.cs" />
     <Compile Include="DynamicRandomness\Behaviours\SequentialAttackBehaviourGroup.cs" />
     <Compile Include="DynamicRandomness\Hooks.cs" />
     <Compile Include="DynamicRandomness\Data Logging\PlaythroughData.cs" />
-    <Compile Include="DynamicRandomness\Behaviours\Overrides\GatlingGullDynamicBehaviour.cs" />
+    <Compile Include="DynamicRandomness\Behaviours\Overrides\SubBehaviours\GatlingGullDynamicBehaviour.cs" />
     <Compile Include="DynamicRandomness\ThesisFloorGenerator.cs" />
     <Compile Include="DynamicRandomness\Behaviours\DynamicAttackBehaviourGroup.cs" />
     <Compile Include="DynamicRandomness\DynamicRandomnessController.cs" />

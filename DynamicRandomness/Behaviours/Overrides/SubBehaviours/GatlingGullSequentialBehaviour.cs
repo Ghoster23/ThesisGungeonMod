@@ -19,7 +19,7 @@ namespace DynamicRandomness.Behaviours.Overrides
 
             this.SequenceOverride = new List<int>()
             {
-                0, 2, 2, 3, 4, 1, 2, 2, 3, 5, 2, 2, 3
+                0, 2, 3, 0, 5
             };
         }
     }

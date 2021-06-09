@@ -6,8 +6,8 @@ namespace DynamicRandomness.Behaviours
 {
     public enum BattleStates
     {
-        Balanced,
         Winning,
+        Balanced,
         Losing
     }
 
@@ -32,6 +32,8 @@ namespace DynamicRandomness.Behaviours
             }
         }
 
+        protected AttackGroupItem m_previousBehaviour;
+
 
         public override void Init(GameObject gameObject, AIActor aiActor, AIShooter aiShooter)
         {
@@ -40,63 +42,35 @@ namespace DynamicRandomness.Behaviours
             m_playerHealth = GameManager.Instance.PrimaryPlayer.healthHaver;
         }
 
+
         public override BehaviorResult Update()
         {
             var result = BehaviorResult.SkipAllRemainingBehaviors;
 
-            switch(m_battleState)
+            Module.Data.UpdateBattleState(1 + (int) m_battleState);
+
+            switch (m_battleState)
             {
                 default:
                     if(Module.Debug) Module.Log("Unrecognized battle state -> " + m_battleState);
-                    break;
-
-                case BattleStates.Losing:
-                case BattleStates.Balanced:
-                    result = base.Update();
                     break;
 
                 case BattleStates.Winning:
                     result = this.SequentialUpdate();
                     break;
 
+                case BattleStates.Balanced:
+                    result = base.Update();
+                    break;
+
+                case BattleStates.Losing:
+                    result = this.RandomUpdate();
+                    break;
             }
 
             return result;
         }
 
-        
-        protected void UpdateBattleState()
-        {
-            float healthPercent = m_playerHealth.GetCurrentHealthPercentage();
-
-            float bossHealthPercent = m_aiActor.healthHaver.GetCurrentHealthPercentage();
-
-            float absDiff = Mathf.Abs(healthPercent - bossHealthPercent);
-
-            if (absDiff < 0.10f)
-            {
-                if (m_battleState == BattleStates.Balanced) return;
-
-                m_battleState = BattleStates.Balanced;
-                this.ActivateBalancedState();
-            }
-            else if (bossHealthPercent < healthPercent)
-            {
-                if (m_battleState == BattleStates.Losing) return;
-
-                m_battleState = BattleStates.Losing;
-                this.ActivateLosingState();
-            }
-            else
-            {
-                if (m_battleState == BattleStates.Winning) return;
-
-                m_battleState = BattleStates.Winning;
-                m_sequenceIndex = 0;
-                this.ActivateWinningState();
-            }
-        }
-        
 
         protected BehaviorResult SequentialUpdate()
         {
@@ -112,6 +86,43 @@ namespace DynamicRandomness.Behaviours
             return this.m_currentBehavior.Update();
         }
 
+        protected BehaviorResult RandomUpdate()
+        {
+            this.ActivateLosingState();
+
+            return base.Update();
+        }
+
+
+        protected void UpdateBattleState()
+        {
+            float healthPercent = m_playerHealth.GetCurrentHealthPercentage();
+
+            float bossHealthPercent = m_aiActor.healthHaver.GetCurrentHealthPercentage();
+
+            float absDiff = Mathf.Abs(healthPercent - bossHealthPercent);
+
+            if (absDiff < 0.075f)
+            {
+                m_battleState = BattleStates.Balanced;
+                this.ActivateBalancedState();
+            }
+            else if (bossHealthPercent < healthPercent)
+            {
+                m_battleState = BattleStates.Losing;
+                this.ActivateLosingState();
+            }
+            else
+            {
+                // This is necessary as to not restart the sequence at every step
+                if (m_battleState == BattleStates.Winning) return;
+
+                m_battleState = BattleStates.Winning;
+                m_sequenceIndex = 0;
+                this.ActivateWinningState();
+            }
+        }
+        
 
         #region Overrides
         public override ContinuousBehaviorResult ContinuousUpdate()
@@ -127,6 +138,12 @@ namespace DynamicRandomness.Behaviours
 
         public override void EndContinuousUpdate()
         {
+            for(var i = 0; i < this.AttackBehaviors.Count; i++)
+            {
+                if (this.AttackBehaviors[i].Behavior == this.CurrentBehavior)
+                    this.m_previousBehaviour = this.AttackBehaviors[i];
+            }
+
             if(m_battleState == BattleStates.Winning)
             {
                 this.m_currentBehavior.EndContinuousUpdate();

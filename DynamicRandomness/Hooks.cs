@@ -167,7 +167,7 @@ namespace DynamicRandomness
         {
             orig(self);
 
-            File.WriteAllText("log.json", Module.Data.GetJSON());
+            File.WriteAllText("DRMod_log.txt", Module.Data.GetJSON());
         }
         #endregion
     }

@@ -32,8 +32,7 @@ namespace DynamicRandomness.Behaviours.Overrides
                     break;
 
                 case 3: // Chaotic
-                    foreach (var attackBehaviour in behaviorSpec.AttackBehaviorGroup.AttackBehaviors)
-                        attackBehaviour.Probability = 1;
+                    this.ChaoticOverride();
                     break;
             }
 
@@ -49,15 +48,6 @@ namespace DynamicRandomness.Behaviours.Overrides
             {
                 AttackBehaviors = origAttackGroup.AttackBehaviors
             };
-
-            /*
-            newBehaviour.AttackBehaviors[0] = new AttackBehaviorGroup.AttackGroupItem()
-            {
-                Behavior = new GatlingGullWalkAndFanSpray(),
-                NickName = "Walk And Fan Spray",
-                Probability = 3f
-            };
-            */
 
             for (var i = 0; i < behaviorSpec.AttackBehaviors.Count; i++)
             {
@@ -94,6 +84,28 @@ namespace DynamicRandomness.Behaviours.Overrides
             newBehaviour.Init(behaviorSpec.gameObject, behaviorSpec.aiActor, behaviorSpec.aiShooter);
 
             newBehaviour.ShareCooldowns = origAttackGroup.ShareCooldowns;
+        }
+
+        private void ChaoticOverride()
+        {
+            var origAttackGroup = behaviorSpec.AttackBehaviorGroup;
+
+            var newBehaviour = new GatlingGullChaoticBehaviour
+            {
+                AttackBehaviors = origAttackGroup.AttackBehaviors
+            };
+
+            for (var i = 0; i < behaviorSpec.AttackBehaviors.Count; i++)
+            {
+                var attackBehaviour = behaviorSpec.AttackBehaviors[i];
+
+                if (attackBehaviour is AttackBehaviorGroup)
+                {
+                    behaviorSpec.AttackBehaviors[i] = newBehaviour;
+                }
+            }
+
+            newBehaviour.Init(behaviorSpec.gameObject, behaviorSpec.aiActor, behaviorSpec.aiShooter);
         }
     }
 }

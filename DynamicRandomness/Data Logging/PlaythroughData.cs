@@ -67,6 +67,11 @@ namespace DynamicRandomness.Data_Logging
             this.currentBattle.BattleEnd(duration, playerHealth, bossHealth);
         }
 
+        public void UpdateBattleState(int stateId)
+        {
+            this.currentBattle.UpdateBattleState(stateId);
+        }
+
 
         public void IncrementDeathCount()
         {
